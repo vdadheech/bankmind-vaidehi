@@ -1,4 +1,5 @@
-# bankmind-[yourname]
+# Bankmind-Vaidehi Dadheech
+
 **VITB AI Innovators Hub · Track A — Data Analyst**
 
 An interactive Streamlit dashboard that surfaces insights from the UCI Bank Marketing Dataset for Relationship Managers.
