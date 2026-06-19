@@ -4,134 +4,206 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-st.set_page_config(page_title="BankMind RM Insights", page_icon="🏦", layout="wide")
+st.set_page_config(page_title="BankMind", page_icon="🏦", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@600&display=swap');
-html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-[data-testid="stSidebar"] { background: #0f172a; }
-[data-testid="stSidebar"] * { color: #cbd5e1 !important; }
-[data-testid="metric-container"] { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 1rem 1.25rem; }
-[data-testid="metric-container"] label { color: #94a3b8 !important; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; }
-[data-testid="metric-container"] [data-testid="stMetricValue"] { color: #f1f5f9 !important; font-family: 'IBM Plex Mono', monospace; font-size: 1.9rem !important; }
-.section-tag { display: inline-block; background: #1e3a5f; color: #60a5fa; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 10px; border-radius: 4px; margin-bottom: 6px; }
-.stApp { background: #0d1117; color: #e2e8f0; }
-.block-container { padding-top: 1.5rem; }
-.insight-box { background: #1e293b; border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0; padding: 0.8rem 1.1rem; margin: 0.5rem 0 1rem 0; font-size: 0.85rem; color: #94a3b8; }
-.insight-box strong { color: #e2e8f0; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+html, body, [class*="css"], .stApp { font-family: 'Inter', sans-serif !important; background: #07090f !important; color: #e2e8f0; }
+.block-container { padding: 1.5rem 2rem 2rem 2rem !important; max-width: 100% !important; }
+
+/* Sidebar */
+[data-testid="stSidebar"] { background: #0c0f1a !important; border-right: 1px solid #1e2540; }
+[data-testid="stSidebar"] * { color: #8892b0 !important; font-family: 'Inter', sans-serif !important; }
+[data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 { color: #ccd6f6 !important; }
+[data-testid="stSidebar"] .stSelectbox label, [data-testid="stSidebar"] .stSlider label {
+  font-size: 0.7rem !important; text-transform: uppercase; letter-spacing: 0.1em; color: #4a5568 !important; font-weight: 600 !important;
+}
+[data-testid="stSidebar"] [data-baseweb="select"] > div { background: #111827 !important; border-color: #1e2540 !important; border-radius: 8px !important; color: #8892b0 !important; }
+[data-testid="stSidebar"] [data-testid="stSliderThumb"] { background: #7c3aed !important; }
+[data-testid="stSidebar"] [data-testid="stSliderTrack"] > div { background: #7c3aed !important; }
+
+/* Metrics */
+[data-testid="metric-container"] {
+  background: linear-gradient(135deg, #0f1629 0%, #111827 100%) !important;
+  border: 1px solid #1e2a4a !important;
+  border-radius: 14px !important;
+  padding: 1.1rem 1.4rem !important;
+}
+[data-testid="metric-container"] label { color: #4a5568 !important; font-size: 0.7rem !important; font-weight: 600 !important; text-transform: uppercase; letter-spacing: 0.1em; }
+[data-testid="metric-container"] [data-testid="stMetricValue"] { color: #e2e8f0 !important; font-family: 'IBM Plex Mono', monospace !important; font-size: 1.75rem !important; font-weight: 600 !important; }
+[data-testid="metric-container"] [data-testid="stMetricDelta"] { font-size: 0.78rem !important; }
+
+/* Headers */
+h1 { font-size: 1.6rem !important; font-weight: 700 !important; color: #ccd6f6 !important; letter-spacing: -0.02em; }
+h2, h3 { color: #a8b2d8 !important; font-weight: 600 !important; }
+
+/* Section tag */
+.stag {
+  display: inline-block; background: #1a1f3c; color: #7c3aed;
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px; border: 1px solid #2d2260;
+  margin-bottom: 6px;
+}
+
+/* Insight box */
+.ibox {
+  background: #0c0f1a; border-left: 2px solid #7c3aed;
+  border-radius: 0 10px 10px 0; padding: 0.85rem 1.1rem;
+  margin: 0.4rem 0 0.8rem; font-size: 0.83rem; line-height: 1.6;
+  color: #64748b;
+}
+.ibox strong { color: #a8b2d8; }
+
+/* Divider */
+hr { border-color: #1e2540 !important; margin: 1.5rem 0 !important; }
+
+/* Logo badge */
+.logo-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #0f1629; border: 1px solid #1e2a4a; border-radius: 10px;
+  padding: 6px 12px; margin-bottom: 1.5rem;
+}
+.logo-dot { width: 8px; height: 8px; background: #7c3aed; border-radius: 50%; }
+.logo-text { font-size: 0.8rem; font-weight: 600; color: #6366f1; letter-spacing: 0.05em; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #07090f; }
+::-webkit-scrollbar-thumb { background: #1e2540; border-radius: 4px; }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Constants ─────────────────────────────────────────────────────────────────
-BLUE  = "#3b82f6"
-GREEN = "#22c55e"
-AMBER = "#f59e0b"
-GRID  = "#334155"
-BG    = "rgba(0,0,0,0)"
+# ── Palette ───────────────────────────────────────────────────────────────────
+PURPLE   = "#7c3aed"
+INDIGO   = "#6366f1"
+VIOLET   = "#a78bfa"
+CYAN     = "#22d3ee"
+GREEN    = "#10b981"
+RED      = "#f43f5e"
+MUTED    = "#4a5568"
+CARD_BG  = "#0c0f1a"
+GRID_C   = "#1e2540"
+PAPER    = "rgba(0,0,0,0)"
+FONT_C   = "#8892b0"
 
-# Shared layout keys — ONLY things that don't conflict across charts
-BASE = dict(
-    paper_bgcolor=BG,
-    plot_bgcolor=BG,
-    font=dict(color="#94a3b8", family="Inter"),
-    title_font=dict(color="#e2e8f0", size=15),
-    margin=dict(l=10, r=10, t=40, b=10),
+# Plotly theme — no shared xaxis/yaxis to avoid conflicts
+PBASE = dict(
+    paper_bgcolor=PAPER, plot_bgcolor=PAPER,
+    font=dict(color=FONT_C, family="Inter, sans-serif"),
+    title_font=dict(color="#a8b2d8", size=14, family="Inter, sans-serif"),
+    margin=dict(l=8, r=8, t=36, b=8),
+    hoverlabel=dict(bgcolor="#111827", bordercolor="#1e2540", font_color="#e2e8f0", font_family="Inter"),
+    legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color=FONT_C)),
 )
 
-def apply_base(fig, **extra):
-    """Merge BASE with per-chart overrides safely."""
-    layout = {**BASE, **extra}
-    fig.update_layout(**layout)
-    # Always style axes after layout is set
-    fig.update_xaxes(gridcolor=GRID, linecolor=GRID, tickfont=dict(color="#64748b"))
-    fig.update_yaxes(gridcolor=GRID, linecolor=GRID, tickfont=dict(color="#64748b"))
+def pbase(fig, **kw):
+    fig.update_layout(**{**PBASE, **kw})
+    fig.update_xaxes(gridcolor=GRID_C, linecolor=GRID_C, tickfont=dict(color="#334155", size=11))
+    fig.update_yaxes(gridcolor=GRID_C, linecolor=GRID_C, tickfont=dict(color="#334155", size=11))
     return fig
 
 # ── Load data ─────────────────────────────────────────────────────────────────
 @st.cache_data
-def load_data():
-    try:
-        df = pd.read_csv("bank-full.csv", sep=";")
-    except FileNotFoundError:
-        df = pd.read_csv("data/bank-full.csv", sep=";")
-    df["subscribed"] = (df["y"] == "yes").astype(int)
-    df["age_group"] = pd.cut(df["age"], bins=[17,30,45,60,100],
-                              labels=["18–30","31–45","46–60","60+"])
-    return df
+def load():
+    for p in ["bank-full.csv", "data/bank-full.csv"]:
+        try:
+            df = pd.read_csv(p, sep=";")
+            df["subscribed"] = (df["y"] == "yes").astype(int)
+            df["age_group"] = pd.cut(df["age"], bins=[17,30,45,60,100], labels=["18–30","31–45","46–60","60+"])
+            return df
+        except FileNotFoundError:
+            continue
+    return None
 
-try:
-    df = load_data()
-except FileNotFoundError:
-    st.error("⚠️ Place `bank-full.csv` in the same folder as `app.py` and rerun.")
+df = load()
+if df is None:
+    st.error("⚠️ Place `bank-full.csv` in the repo root and rerun.")
     st.stop()
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🏦 BankMind")
-    st.markdown("<small style='color:#475569'>RM Intelligence Dashboard · Track A</small>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='padding: 1rem 0 0.5rem;'>
+      <div style='font-size:1.1rem; font-weight:700; color:#ccd6f6; letter-spacing:-0.01em;'>🏦 BankMind</div>
+      <div style='font-size:0.7rem; color:#2d3a5e; margin-top:2px; text-transform:uppercase; letter-spacing:0.1em;'>RM Intelligence · Track A</div>
+    </div>
+    """, unsafe_allow_html=True)
     st.divider()
+    st.markdown("<div style='font-size:0.68rem;color:#2d3a5e;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;'>Filters</div>", unsafe_allow_html=True)
+
     age_opts = ["All"] + list(df["age_group"].cat.categories)
     sel_age  = st.selectbox("Age group", age_opts)
-    job_opts = ["All"] + sorted(df["job"].unique().tolist())
+    job_opts = ["All"] + sorted(df["job"].unique())
     sel_job  = st.selectbox("Job type", job_opts)
-    edu_opts = ["All"] + sorted(df["education"].unique().tolist())
+    edu_opts = ["All"] + sorted(df["education"].unique())
     sel_edu  = st.selectbox("Education", edu_opts)
-    bal_min, bal_max = int(df["balance"].min()), int(df["balance"].max())
-    bal_range = st.slider("Balance (€)", bal_min, bal_max, (bal_min, bal_max))
+    b0, b1   = int(df["balance"].min()), int(df["balance"].max())
+    bal      = st.slider("Balance range (€)", b0, b1, (b0, b1))
     st.divider()
-    st.markdown("<small style='color:#475569'>UCI Bank Marketing · ~45,000 records</small>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-size:0.72rem;color:#2d3a5e;line-height:1.7;'>UCI Bank Marketing<br>{len(df):,} customer records</div>", unsafe_allow_html=True)
 
 # ── Filter ────────────────────────────────────────────────────────────────────
 f = df.copy()
 if sel_age != "All": f = f[f["age_group"] == sel_age]
 if sel_job != "All": f = f[f["job"] == sel_job]
 if sel_edu != "All": f = f[f["education"] == sel_edu]
-f = f[(f["balance"] >= bal_range[0]) & (f["balance"] <= bal_range[1])]
+f = f[f["balance"].between(bal[0], bal[1])]
 
-# ── Header & KPIs ─────────────────────────────────────────────────────────────
-st.markdown("# BankMind · RM Insights Dashboard")
-st.markdown(f"<div class='insight-box'>Showing <strong>{len(f):,}</strong> of <strong>{len(df):,}</strong> customer records.</div>", unsafe_allow_html=True)
+sub_rate = f["subscribed"].mean() * 100
+avg_bal  = f["balance"].mean()
 
+# ── Header ────────────────────────────────────────────────────────────────────
+c_hd, c_badge = st.columns([5,1])
+with c_hd:
+    st.markdown("## Customer Subscription Intelligence")
+    st.markdown(f"<div style='font-size:0.82rem;color:#334155;margin-top:-8px;margin-bottom:16px;'>{len(f):,} of {len(df):,} records · Filters active</div>", unsafe_allow_html=True)
+
+# ── KPI row ───────────────────────────────────────────────────────────────────
 k1, k2, k3, k4 = st.columns(4)
-k1.metric("Customers", f"{len(f):,}")
-k2.metric("Subscribers", f"{f['subscribed'].sum():,}")
-k3.metric("Subscription Rate", f"{f['subscribed'].mean()*100:.1f}%")
-k4.metric("Avg Balance", f"€{f['balance'].mean():,.0f}")
+k1.metric("Total customers",    f"{len(f):,}")
+k2.metric("Subscribers (y=yes)",f"{f['subscribed'].sum():,}")
+k3.metric("Subscription rate",  f"{sub_rate:.1f}%",  delta=f"{sub_rate-11.7:+.1f}pp vs baseline")
+k4.metric("Avg account balance",f"€{avg_bal:,.0f}")
+
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Q1 — Job type
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown('<span class="section-tag">Question 1</span>', unsafe_allow_html=True)
-st.subheader("Which job types have the highest subscription rate?")
+st.markdown('<span class="stag">Q1</span>', unsafe_allow_html=True)
+st.markdown("### Job types vs subscription rate")
 
-job_stats = (
-    f.groupby("job")["subscribed"]
-    .agg(total="count", subs="sum")
-    .assign(rate=lambda x: x["subs"] / x["total"] * 100)
-    .sort_values("rate")
-    .reset_index()
-)
+js = (f.groupby("job")["subscribed"]
+      .agg(total="count", subs="sum")
+      .assign(rate=lambda x: x["subs"]/x["total"]*100)
+      .sort_values("rate").reset_index())
 
-col1a, col1b = st.columns([3, 2])
-with col1a:
-    fig = px.bar(job_stats, x="rate", y="job", orientation="h",
-                 text=job_stats["rate"].map("{:.1f}%".format),
-                 color="rate", color_continuous_scale=["#1e3a5f", BLUE, "#93c5fd"],
-                 labels={"rate": "Subscription Rate (%)", "job": ""},
-                 title="Subscription Rate by Job Type")
-    fig.update_traces(textposition="outside", textfont_color="#e2e8f0")
-    apply_base(fig, height=380, coloraxis_showscale=False)
-    st.plotly_chart(fig, width="stretch")
+ca, cb = st.columns([3,2])
+with ca:
+    color_list = [PURPLE if r == js["rate"].max() else "#1e2a4a" for r in js["rate"]]
+    fig = go.Figure(go.Bar(
+        x=js["rate"], y=js["job"], orientation="h",
+        marker=dict(color=color_list, line=dict(width=0)),
+        text=js["rate"].map("{:.1f}%".format),
+        textposition="outside", textfont=dict(color="#64748b", size=11),
+        hovertemplate="<b>%{y}</b>: %{x:.1f}%<extra></extra>",
+    ))
+    pbase(fig, height=370, xaxis_title="", yaxis_title="")
+    fig.update_xaxes(showgrid=False, showticklabels=False)
+    st.plotly_chart(fig, use_container_width=True)
 
-with col1b:
-    top = job_stats.iloc[-1]; bot = job_stats.iloc[0]
-    st.markdown(f"""<div class='insight-box'><strong>🏆 Highest:</strong> {top['job'].title()} — {top['rate']:.1f}%<br><br>
-    <strong>📉 Lowest:</strong> {bot['job'].title()} — {bot['rate']:.1f}%<br><br>
-    Top segment converts at <strong>{top['rate']/bot['rate']:.1f}×</strong> the rate of the lowest.</div>""", unsafe_allow_html=True)
-    top5 = job_stats.nlargest(5,"rate")[["job","rate","total"]].rename(columns={"job":"Job","rate":"Rate %","total":"Customers"})
-    top5["Rate %"] = top5["Rate %"].map("{:.1f}%".format)
+with cb:
+    top = js.iloc[-1]; bot = js.iloc[0]
+    st.markdown(f"""<div class='ibox'>
+    <strong>Highest · {top['job'].title()}</strong> — {top['rate']:.1f}%<br>
+    <strong>Lowest · {bot['job'].title()}</strong> — {bot['rate']:.1f}%<br><br>
+    Top segment converts at <strong>{top['rate']/max(bot['rate'],0.1):.1f}×</strong> the rate of the lowest.
+    RMs should prioritise <strong>{top['job'].title()}</strong> and <strong>{js.iloc[-2]['job'].title()}</strong> outreach.
+    </div>""", unsafe_allow_html=True)
+    top5 = js.nlargest(5,"rate")[["job","rate","total"]].copy()
+    top5.columns = ["Job","Rate","Customers"]
+    top5["Rate"] = top5["Rate"].map("{:.1f}%".format)
     st.dataframe(top5, hide_index=True, use_container_width=True)
 
 st.divider()
@@ -139,170 +211,183 @@ st.divider()
 # ══════════════════════════════════════════════════════════════════════════════
 # Q2 — Balance
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown('<span class="section-tag">Question 2</span>', unsafe_allow_html=True)
-st.subheader("Is there a pattern between account balance and likelihood to subscribe?")
+st.markdown('<span class="stag">Q2</span>', unsafe_allow_html=True)
+st.markdown("### Account balance vs likelihood to subscribe")
 
 q2 = f[f["balance"] < f["balance"].quantile(0.99)].copy()
 q2["balance_bin"] = pd.qcut(q2["balance"], q=8, duplicates="drop")
-bal_stats = (
-    q2.groupby("balance_bin", observed=True)["subscribed"]
-    .agg(total="count", subs="sum")
-    .assign(rate=lambda x: x["subs"] / x["total"] * 100)
-    .reset_index()
-)
-bal_stats["bin_label"] = bal_stats["balance_bin"].apply(lambda x: f"€{x.left:,.0f}–{x.right:,.0f}")
+bs = (q2.groupby("balance_bin", observed=True)["subscribed"]
+      .agg(total="count", subs="sum")
+      .assign(rate=lambda x: x["subs"]/x["total"]*100).reset_index())
+bs["lbl"] = bs["balance_bin"].apply(lambda x: f"€{x.left:,.0f}–{x.right:,.0f}")
 
-col2a, col2b = st.columns([3, 2])
-with col2a:
+ca, cb = st.columns([3,2])
+with ca:
     fig2 = go.Figure()
-    fig2.add_trace(go.Bar(x=bal_stats["bin_label"], y=bal_stats["rate"],
-                          marker_color=BLUE, marker_opacity=0.85, name="Sub rate %",
-                          hovertemplate="<b>%{x}</b><br>Rate: %{y:.1f}%<extra></extra>"))
-    fig2.add_trace(go.Scatter(x=bal_stats["bin_label"], y=bal_stats["rate"],
-                              mode="lines+markers", line=dict(color=AMBER, width=2),
-                              marker=dict(size=7, color=AMBER), name="Trend"))
-    apply_base(fig2, height=360, title="Subscription Rate by Balance Decile",
-               xaxis_tickangle=-30,
-               legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color="#94a3b8")))
-    st.plotly_chart(fig2, width="stretch")
+    fig2.add_trace(go.Bar(
+        x=bs["lbl"], y=bs["rate"], name="Rate %",
+        marker=dict(
+            color=bs["rate"],
+            colorscale=[[0,"#1a1040"],[0.5,PURPLE],[1.0,VIOLET]],
+            line=dict(width=0),
+        ),
+        hovertemplate="<b>%{x}</b><br>Rate: %{y:.1f}%<extra></extra>",
+    ))
+    fig2.add_trace(go.Scatter(
+        x=bs["lbl"], y=bs["rate"], mode="lines+markers",
+        line=dict(color=CYAN, width=1.5, dash="dot"),
+        marker=dict(size=5, color=CYAN), name="Trend",
+        hovertemplate="%{y:.1f}%<extra>Trend</extra>",
+    ))
+    pbase(fig2, height=320, xaxis_tickangle=-25,
+          legend=dict(orientation="h", y=1.08, x=0))
+    st.plotly_chart(fig2, use_container_width=True)
 
-with col2b:
-    hi = bal_stats.iloc[-1]["rate"]; lo = bal_stats.iloc[0]["rate"]
-    st.markdown(f"""<div class='insight-box'>Highest balance bracket: <strong>{hi:.1f}%</strong> vs lowest: <strong>{lo:.1f}%</strong>.<br><br>
-    Higher balance signals greater financial engagement. RMs should flag <strong>high-balance + no-loan</strong> customers as prime targets.</div>""", unsafe_allow_html=True)
-    fig_box = px.box(q2, x="y", y="balance", color="y",
-                     color_discrete_map={"yes": GREEN, "no": "#475569"},
-                     labels={"y": "Subscribed", "balance": "Balance (€)"},
-                     title="Balance Distribution by Outcome")
-    apply_base(fig_box, height=260, showlegend=False, title_font=dict(color="#e2e8f0", size=13))
-    st.plotly_chart(fig_box, width="stretch")
+with cb:
+    hi = bs.iloc[-1]["rate"]; lo = bs.iloc[0]["rate"]
+    yes_med = f[f["y"]=="yes"]["balance"].median()
+    no_med  = f[f["y"]=="no"]["balance"].median()
+    st.markdown(f"""<div class='ibox'>
+    Highest bracket: <strong>{hi:.1f}%</strong> · Lowest: <strong>{lo:.1f}%</strong><br><br>
+    Median balance of subscribers: <strong>€{yes_med:,.0f}</strong><br>
+    Median balance of non-subscribers: <strong>€{no_med:,.0f}</strong><br><br>
+    Higher balance signals greater financial engagement. Flag <strong>high-balance + no-loan</strong> as prime targets.
+    </div>""", unsafe_allow_html=True)
+
+    fig_box = px.box(
+        q2, x="y", y="balance", color="y",
+        color_discrete_map={"yes": GREEN, "no": "#1e2a4a"},
+        labels={"y":"","balance":"Balance (€)"},
+    )
+    fig_box.update_traces(marker_size=3, line_width=1.2)
+    pbase(fig_box, height=220, showlegend=False, title="Balance by outcome")
+    st.plotly_chart(fig_box, use_container_width=True)
 
 st.divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
-# Q3 — Age group
+# Q3 — Age groups
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown('<span class="section-tag">Question 3</span>', unsafe_allow_html=True)
-st.subheader("How does subscription rate differ across age groups?")
+st.markdown('<span class="stag">Q3</span>', unsafe_allow_html=True)
+st.markdown("### Subscription rate across age groups")
 
-age_stats = (
-    f.groupby("age_group", observed=True)["subscribed"]
-    .agg(total="count", subs="sum")
-    .assign(rate=lambda x: x["subs"] / x["total"] * 100,
-            no_subs=lambda x: x["total"] - x["subs"])
-    .reset_index()
-)
-labels = age_stats["age_group"].astype(str).tolist()
+ag = (f.groupby("age_group", observed=True)["subscribed"]
+      .agg(total="count", subs="sum")
+      .assign(rate=lambda x: x["subs"]/x["total"]*100,
+              no_subs=lambda x: x["total"]-x["subs"])
+      .reset_index())
+lbls = ag["age_group"].astype(str).tolist()
 
-col3a, col3b = st.columns([2, 3])
-with col3a:
-    fig_pie = px.pie(age_stats, names="age_group", values="total",
-                     color_discrete_sequence=[BLUE, "#60a5fa", "#93c5fd", "#bfdbfe"],
-                     title="Customer Distribution by Age", hole=0.45)
-    fig_pie.update_traces(textfont_color="white", textinfo="percent+label")
-    # Use a separate dict to avoid any key conflicts — no xaxis/yaxis needed for pie
-    fig_pie.update_layout(
-        paper_bgcolor=BG, plot_bgcolor=BG,
-        font=dict(color="#94a3b8", family="Inter"),
-        title_font=dict(color="#e2e8f0", size=15),
-        margin=dict(l=0, r=0, t=40, b=0),
-        showlegend=False, height=300
-    )
-    st.plotly_chart(fig_pie, width="stretch")
+ca, cb = st.columns([2,3])
+with ca:
+    colors_pie = [PURPLE, INDIGO, VIOLET, "#312e81"]
+    fig_pie = go.Figure(go.Pie(
+        labels=lbls, values=ag["total"].tolist(), hole=0.52,
+        marker=dict(colors=colors_pie, line=dict(color="#07090f", width=2)),
+        textfont=dict(color="#e2e8f0", size=12),
+        hovertemplate="<b>%{label}</b><br>%{value:,} customers (%{percent})<extra></extra>",
+    ))
+    fig_pie.update_layout(**{**PBASE, "height":280, "showlegend":False,
+                             "margin":dict(l=0,r=0,t=8,b=0),
+                             "annotations":[dict(text="by age",x=0.5,y=0.5,
+                                                 font=dict(size=11,color="#334155"),showarrow=False)]})
+    st.plotly_chart(fig_pie, use_container_width=True)
 
-with col3b:
+with cb:
     fig_age = go.Figure()
-    fig_age.add_trace(go.Bar(name="Subscribed", x=labels, y=age_stats["subs"].tolist(),
-                             marker_color=GREEN))
-    fig_age.add_trace(go.Bar(name="Not subscribed", x=labels, y=age_stats["no_subs"].tolist(),
-                             marker_color="#1e3a5f"))
-    fig_age.add_trace(go.Scatter(x=labels, y=age_stats["rate"].tolist(),
-                                 mode="lines+markers+text",
-                                 line=dict(color=AMBER, width=2.5),
-                                 marker=dict(size=9, color=AMBER),
-                                 text=age_stats["rate"].map("{:.1f}%".format).tolist(),
-                                 textposition="top center",
-                                 textfont=dict(color=AMBER, size=11),
-                                 name="Rate %", yaxis="y2"))
-    # Build layout dict manually — no PLOTLY_LAYOUT spread to avoid yaxis conflict
+    fig_age.add_trace(go.Bar(name="Subscribed", x=lbls, y=ag["subs"].tolist(),
+                             marker=dict(color=PURPLE, line=dict(width=0)),
+                             hovertemplate="<b>%{x}</b><br>Subscribed: %{y:,}<extra></extra>"))
+    fig_age.add_trace(go.Bar(name="Not subscribed", x=lbls, y=ag["no_subs"].tolist(),
+                             marker=dict(color="#111827", line=dict(color=GRID_C, width=1)),
+                             hovertemplate="<b>%{x}</b><br>Not subscribed: %{y:,}<extra></extra>"))
+    fig_age.add_trace(go.Scatter(
+        x=lbls, y=ag["rate"].tolist(), mode="lines+markers+text",
+        line=dict(color=CYAN, width=2), marker=dict(size=8, color=CYAN),
+        text=ag["rate"].map("{:.1f}%".format).tolist(),
+        textposition="top center", textfont=dict(color=CYAN, size=11),
+        name="Rate %", yaxis="y2",
+        hovertemplate="<b>%{x}</b><br>Rate: %{y:.1f}%<extra></extra>",
+    ))
     fig_age.update_layout(
-        paper_bgcolor=BG, plot_bgcolor=BG,
-        font=dict(color="#94a3b8", family="Inter"),
-        title_font=dict(color="#e2e8f0", size=15),
-        margin=dict(l=10, r=10, t=40, b=10),
-        barmode="stack", height=320,
-        title="Customers & Subscription Rate by Age Group",
-        yaxis=dict(title="Customers", gridcolor=GRID, linecolor=GRID, tickfont=dict(color="#64748b")),
+        **{k:v for k,v in PBASE.items() if k not in ("margin",)},
+        margin=dict(l=8,r=8,t=36,b=8),
+        barmode="stack", height=280,
+        xaxis=dict(gridcolor=GRID_C, linecolor=GRID_C, tickfont=dict(color="#334155", size=12)),
+        yaxis=dict(title="Customers", gridcolor=GRID_C, linecolor=GRID_C, tickfont=dict(color="#334155")),
         yaxis2=dict(title="Rate %", overlaying="y", side="right",
-                    range=[0, age_stats["rate"].max() * 2],
-                    gridcolor="rgba(0,0,0,0)", showgrid=False, tickfont=dict(color=AMBER)),
-        xaxis=dict(gridcolor=GRID, linecolor=GRID, tickfont=dict(color="#64748b")),
-        legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color="#94a3b8"),
-                    orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                    range=[0, ag["rate"].max()*2.2],
+                    showgrid=False, tickfont=dict(color=CYAN, size=11)),
+        legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(color=FONT_C),
+                    orientation="h", y=1.1, x=0),
     )
-    st.plotly_chart(fig_age, width="stretch")
+    st.plotly_chart(fig_age, use_container_width=True)
 
-best_age = age_stats.loc[age_stats["rate"].idxmax()]
-st.markdown(f"""<div class='insight-box'><strong>Key finding:</strong> The <strong>{best_age['age_group']}</strong> age group 
-has the highest subscription rate at <strong>{best_age['rate']:.1f}%</strong>. Both youngest and oldest segments tend to show 
-higher engagement — the former are forming new banking habits, the latter are shifting toward wealth preservation.</div>""", unsafe_allow_html=True)
+best = ag.loc[ag["rate"].idxmax()]
+st.markdown(f"""<div class='ibox'><strong>{best['age_group']}</strong> age group leads at <strong>{best['rate']:.1f}%</strong>.
+Both youngest (forming habits) and oldest (wealth preservation) segments are most receptive to new products.</div>""",
+unsafe_allow_html=True)
 
 st.divider()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Q4 — Housing loan
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown('<span class="section-tag">Question 4</span>', unsafe_allow_html=True)
-st.subheader("Does having a housing loan reduce uptake of new products?")
+st.markdown('<span class="stag">Q4</span>', unsafe_allow_html=True)
+st.markdown("### Does a housing loan reduce new product uptake?")
 
-housing_rate = (
-    f.groupby("housing")["subscribed"]
-    .agg(total="count", subs="sum")
-    .assign(rate=lambda x: x["subs"] / x["total"] * 100)
-    .reset_index()
-)
+hr = (f.groupby("housing")["subscribed"]
+      .agg(total="count", subs="sum")
+      .assign(rate=lambda x: x["subs"]/x["total"]*100).reset_index())
 
-col4a, col4b = st.columns([2, 3])
-with col4a:
-    fig_h = px.bar(housing_rate, x="housing", y="rate", color="housing",
-                   color_discrete_map={"yes": "#ef4444", "no": GREEN},
-                   text=housing_rate["rate"].map("{:.1f}%".format),
-                   labels={"housing": "Has Housing Loan", "rate": "Subscription Rate (%)"},
-                   title="Subscription Rate: Housing Loan vs None")
-    fig_h.update_traces(textposition="outside", textfont_color="#e2e8f0")
-    apply_base(fig_h, height=320, showlegend=False)
-    st.plotly_chart(fig_h, width="stretch")
+ca, cb = st.columns([2,3])
+with ca:
+    fig_h = go.Figure(go.Bar(
+        x=hr["housing"].tolist(), y=hr["rate"].tolist(),
+        marker=dict(color=[GREEN if h=="no" else RED for h in hr["housing"]],
+                    line=dict(width=0)),
+        text=hr["rate"].map("{:.1f}%".format).tolist(),
+        textposition="outside", textfont=dict(color="#64748b"),
+        hovertemplate="<b>%{x}</b>: %{y:.1f}%<extra></extra>",
+    ))
+    pbase(fig_h, height=300, showlegend=False,
+          xaxis=dict(ticktext=["No loan","Has loan"], tickvals=["no","yes"],
+                     gridcolor=GRID_C, linecolor=GRID_C, tickfont=dict(color="#334155")))
+    st.plotly_chart(fig_h, use_container_width=True)
 
-with col4b:
+with cb:
     cross = f.groupby(["housing","loan"])["subscribed"].mean().mul(100).unstack()
-    fig_heat = px.imshow(cross,
-                         color_continuous_scale=["#0f172a","#1e3a5f", BLUE,"#93c5fd"],
-                         labels=dict(x="Has Personal Loan", y="Has Housing Loan", color="Sub Rate %"),
-                         text_auto=".1f",
-                         title="Subscription Rate (%) — Housing × Personal Loan",
-                         aspect="auto")
-    fig_heat.update_layout(
-        paper_bgcolor=BG, plot_bgcolor=BG,
-        font=dict(color="#94a3b8", family="Inter"),
-        title_font=dict(color="#e2e8f0", size=15),
-        margin=dict(l=10, r=10, t=40, b=10),
-        height=320,
-        coloraxis_colorbar=dict(tickfont=dict(color="#94a3b8"))
+    fig_heat = px.imshow(
+        cross,
+        color_continuous_scale=[[0,"#07090f"],[0.4,"#1a1040"],[0.7,PURPLE],[1.0,VIOLET]],
+        labels=dict(x="Personal loan", y="Housing loan", color="Sub rate %"),
+        text_auto=".1f", aspect="auto",
+        zmin=0, zmax=cross.values.max()*1.1,
     )
-    st.plotly_chart(fig_heat, width="stretch")
+    fig_heat.update_traces(textfont=dict(color="#e2e8f0", size=15))
+    fig_heat.update_layout(
+        **{k:v for k,v in PBASE.items() if k != "margin"},
+        margin=dict(l=8,r=8,t=8,b=8),
+        height=300,
+        xaxis=dict(tickfont=dict(color="#334155", size=12), linecolor=GRID_C),
+        yaxis=dict(tickfont=dict(color="#334155", size=12), linecolor=GRID_C),
+        coloraxis_colorbar=dict(tickfont=dict(color=FONT_C, size=10), title=dict(text="", side="right")),
+    )
+    st.plotly_chart(fig_heat, use_container_width=True)
 
-no_rate  = housing_rate.loc[housing_rate["housing"]=="no",  "rate"].values[0]
-yes_rate = housing_rate.loc[housing_rate["housing"]=="yes", "rate"].values[0]
-st.markdown(f"""<div class='insight-box'><strong>Clear signal:</strong> Customers <em>without</em> a housing loan subscribe at 
-<strong>{no_rate:.1f}%</strong> — <strong>{no_rate-yes_rate:.1f}pp higher</strong> than those with one ({yes_rate:.1f}%). 
-The heatmap shows <strong>no housing + no personal loan</strong> is the most receptive segment. 
-RMs should prioritise debt-free customers.</div>""", unsafe_allow_html=True)
+no_r  = hr.loc[hr["housing"]=="no",  "rate"].values[0]
+yes_r = hr.loc[hr["housing"]=="yes", "rate"].values[0]
+st.markdown(f"""<div class='ibox'><strong>No housing loan → {no_r:.1f}%</strong> vs <strong>has housing loan → {yes_r:.1f}%</strong> 
+({no_r-yes_r:.1f}pp difference). Debt-free customers are the most receptive segment. 
+<strong>No housing + no personal loan</strong> is the prime RM target.</div>""", unsafe_allow_html=True)
 
 st.divider()
 
-with st.expander("🔎 Explore raw data"):
-    st.dataframe(f[["age","age_group","job","education","balance","housing","loan","y"]].head(500),
-                 use_container_width=True)
-    st.caption(f"Showing first 500 of {len(f):,} filtered records.")
+with st.expander("🔎 Raw data explorer"):
+    st.dataframe(
+        f[["age","age_group","job","education","balance","housing","loan","y"]].head(500),
+        use_container_width=True,
+    )
+    st.caption(f"First 500 of {len(f):,} filtered rows.")
 
-st.markdown("<br><small style='color:#475569'>BankMind · VITB AI Innovators Hub · Track A · UCI Bank Marketing Dataset</small>", unsafe_allow_html=True)
+st.markdown("<br><div style='font-size:0.7rem;color:#1e2540;text-align:center;'>BankMind · VITB AI Innovators Hub · Track A · UCI Bank Marketing Dataset</div>", unsafe_allow_html=True)
