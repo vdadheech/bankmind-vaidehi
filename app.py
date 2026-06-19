@@ -332,8 +332,8 @@ with col_q3a:
         hole=0.45,
     )
     fig_age_pie.update_traces(textfont_color="white", textinfo="percent+label")
-    fig_age_pie.update_layout(**PLOTLY_LAYOUT, height=300,
-                               showlegend=False, margin=dict(l=0, r=0, t=40, b=0))
+    pie_layout = {**PLOTLY_LAYOUT, "margin": dict(l=0, r=0, t=40, b=0)}
+    fig_age_pie.update_layout(**pie_layout, height=300, showlegend=False)
     st.plotly_chart(fig_age_pie, use_container_width=True)
 
 with col_q3b:
