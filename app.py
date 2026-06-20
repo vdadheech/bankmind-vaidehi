@@ -143,8 +143,14 @@ section[data-testid="stSidebar"] { display: none; }
     border-radius: 7px !important; font-size: .78rem !important; color: #374151 !important;
     min-height: 32px !important;
 }
-.stSelectbox label { font-size: .65rem !important; font-weight: 700 !important;
-                     text-transform: uppercase; letter-spacing: .1em; color: #9ca3af !important; }
+.stSelectbox label, [data-testid="stWidgetLabel"] {
+    font-size: .65rem !important; font-weight: 700 !important;
+    text-transform: uppercase; letter-spacing: .1em; color: #9ca3af !important;
+}
+[data-testid="stSlider"] label {
+    font-size: .65rem !important; font-weight: 700 !important;
+    text-transform: uppercase; letter-spacing: .08em; color: #9ca3af !important;
+}
 [data-testid="stSlider"] > div > div { color: #6366f1 !important; }
 div[data-baseweb="slider"] div[role="slider"] { background: #6366f1 !important; border-color: #6366f1 !important; }
 div[data-baseweb="slider"] [data-testid="stSliderTrackFill"] { background: #6366f1 !important; }
@@ -231,20 +237,40 @@ st.markdown("""
 # ─────────────────────────────────────────────────────────────────
 # FILTER BAR (inline, no sidebar)
 # ─────────────────────────────────────────────────────────────────
-st.markdown('<div class="fbar"><span class="fbar-label">Filters</span></div>', unsafe_allow_html=True)
+st.markdown("""
+<div style='background:#fff;border-bottom:1px solid #e5e7eb;padding:8px 28px 0;
+     display:flex;align-items:center;gap:8px;'>
+  <span style='font-size:.65rem;font-weight:700;text-transform:uppercase;
+       letter-spacing:.12em;color:#9ca3af;white-space:nowrap;margin-right:4px;'>
+    Filters
+  </span>
+</div>
+""", unsafe_allow_html=True)
 
-fc1, fc2, fc3, fc4, fc5 = st.columns([1,1,1,2,1])
+fc1, fc2, fc3, fc4, fc5 = st.columns([1, 1, 1, 2, 1])
 with fc1:
-    sel_age = st.selectbox("Age group", ["All"] + list(df["age_group"].cat.categories), label_visibility="collapsed")
+    sel_age = st.selectbox("Age group", ["All"] + list(df["age_group"].cat.categories),
+                           label_visibility="visible")
 with fc2:
-    sel_job = st.selectbox("Job", ["All"] + sorted(df["job"].unique()), label_visibility="collapsed")
+    sel_job = st.selectbox("Job type", ["All"] + sorted(df["job"].unique()),
+                           label_visibility="visible")
 with fc3:
-    sel_edu = st.selectbox("Education", ["All"] + sorted(df["education"].unique()), label_visibility="collapsed")
+    sel_edu = st.selectbox("Education", ["All"] + sorted(df["education"].unique()),
+                           label_visibility="visible")
 with fc4:
-    b0, b1  = int(df["balance"].min()), int(df["balance"].max())
-    bal     = st.slider("Balance", b0, b1, (b0, b1), label_visibility="collapsed")
+    # UCI dataset has negative balances (overdrafts) — show full real range but label clearly
+    b0 = int(df["balance"].min())
+    b1 = int(df["balance"].max())
+    bal = st.slider(
+        f"Account balance (€{b0:,} to €{b1:,})",
+        min_value=b0, max_value=b1, value=(b0, b1),
+    )
 with fc5:
-    st.markdown("<div style='padding-top:6px;font-size:.72rem;color:#9ca3af;'>← drag to filter balance</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div style='padding-top:28px;font-size:.7rem;color:#9ca3af;'>"
+        "⚠️ Negative = overdraft</div>",
+        unsafe_allow_html=True,
+    )
 
 # ─────────────────────────────────────────────────────────────────
 # FILTER
