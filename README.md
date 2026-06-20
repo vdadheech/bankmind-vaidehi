@@ -68,7 +68,7 @@ Open [http://localhost:8501](http://localhost:8501) in your browser.
 ---
 
 ## Live Demo
-🔗 *[Add your deployment link here — Streamlit Cloud, HuggingFace Spaces, etc.]*
+🔗 https://bankmind-vaidehi-feunnfahzajsz5zcib85ul.streamlit.app/
 
 ---
 
