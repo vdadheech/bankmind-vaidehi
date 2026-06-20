@@ -492,6 +492,7 @@ with r2a:
     bs = (q2.groupby("balance_bin", observed=True)["subscribed"]
             .agg(total="count", subs="sum")
             .assign(rate=lambda x: x["subs"]/x["total"]*100).reset_index())
+    bs = bs[bs["total"] > 0].dropna(subset=["rate"]).reset_index(drop=True)
     bs["lbl"] = bs["balance_bin"].apply(lambda x: f"€{x.left:,.0f}–{x.right:,.0f}")
 
     fig_b = go.Figure()
@@ -499,7 +500,7 @@ with r2a:
     fig_b.add_trace(go.Bar(
         x=bs["lbl"], y=bs["total"] / bs["total"].max() * bs["rate"].max() * 0.6,
         marker=dict(color="#f3f4f6", line=dict(width=0)),
-        name="Volume (scaled)", hoverinfo="skip",
+        name="Volume (scaled)", hoverinfo="skip", showlegend=False,
     ))
     # Rate bars
     fig_b.add_trace(go.Bar(
