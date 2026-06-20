@@ -190,9 +190,10 @@ def lay(**kw):
 
 def axes(fig, xa=0):
     fig.update_xaxes(gridcolor=GRID, linecolor="#e5e7eb", zeroline=False,
-                     tickfont=dict(color="#9ca3af", size=10), tickangle=xa)
+                     tickfont=dict(color="#9ca3af", size=10), tickangle=xa,
+                     automargin=True)
     fig.update_yaxes(gridcolor=GRID, linecolor="#e5e7eb", zeroline=False,
-                     tickfont=dict(color="#9ca3af", size=10))
+                     tickfont=dict(color="#9ca3af", size=10), automargin=True)
     return fig
 
 # ── Data ──────────────────────────────────────────────────────────
@@ -364,13 +365,15 @@ with r1a:
         marker=dict(color=palette, line=dict(width=0)),
         text=js["rate"].map("{:.1f}%".format),
         textposition="outside",
+        cliponaxis=False,
         textfont=dict(color="#9ca3af", size=10, family="JetBrains Mono"),
         hovertemplate="<b>%{y}</b><br>%{x:.1f}% subscription rate<extra></extra>",
     ))
-    fig.update_layout(**lay(height=300))
-    fig.update_xaxes(showgrid=False, showticklabels=False, linecolor="#e5e7eb", zeroline=False)
+    fig.update_layout(**lay(height=300, margin=dict(l=4, r=44, t=8, b=4)))
+    fig.update_xaxes(showgrid=False, showticklabels=False, linecolor="#e5e7eb",
+                      zeroline=False, range=[0, js["rate"].max() * 1.18])
     fig.update_yaxes(gridcolor=GRID, linecolor="#e5e7eb", zeroline=False,
-                     tickfont=dict(color="#374151", size=11))
+                     tickfont=dict(color="#374151", size=11), automargin=True)
 
     top_j = js.iloc[-1]; bot_j = js.iloc[0]
     ratio  = top_j["rate"]/bot_j["rate"] if bot_j["rate"] > 0 else 0
@@ -444,12 +447,15 @@ with r1b:
         marker=dict(color=colors_c, line=dict(width=0)),
         text=cross_df["rate"].map("{:.1f}%".format),
         textposition="outside",
+        cliponaxis=False,
         textfont=dict(color="#9ca3af", size=10, family="JetBrains Mono"),
         hovertemplate="<b>%{y}</b><br>%{x:.1f}%<extra></extra>",
     ))
-    fig_cb.update_layout(**lay(height=140))
-    fig_cb.update_xaxes(showgrid=False, showticklabels=False, linecolor="#e5e7eb", zeroline=False)
-    fig_cb.update_yaxes(tickfont=dict(color="#374151", size=9.5), linecolor="#e5e7eb", zeroline=False, gridcolor=GRID)
+    fig_cb.update_layout(**lay(height=160, margin=dict(l=4, r=44, t=8, b=4)))
+    fig_cb.update_xaxes(showgrid=False, showticklabels=False, linecolor="#e5e7eb",
+                         zeroline=False, range=[0, cross_df["rate"].max() * 1.25])
+    fig_cb.update_yaxes(tickfont=dict(color="#374151", size=9.5), linecolor="#e5e7eb",
+                         zeroline=False, gridcolor=GRID, automargin=True)
 
     st.plotly_chart(fig_cb, use_container_width=True)
     st.markdown(f"""
